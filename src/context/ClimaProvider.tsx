@@ -11,8 +11,8 @@ interface ResultadoAPI {
     name: string,
     main : {
         temp: number,
-        tempmax: number,
-        tempmin: number
+        temp_max: number,
+        temp_min: number
     }
 }
 
@@ -20,6 +20,7 @@ export interface ClimaContextProps {
     busqueda: BusquedaPayLoad,
     resultado : ResultadoAPI,
     actualizarDatosBusqueda: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+    consultarClima: (datos: BusquedaPayLoad) => void;
 }
 
 const ClimaContext = createContext<ClimaContextProps>({} as ClimaContextProps);
@@ -41,20 +42,30 @@ const ClimaProvider = ({children}: PropsWithChildren) => {
     }
 
 
-    const consultarClima = async (datos : BusquedaPayLoad) => {
+    const consultarClima = async (datos: BusquedaPayLoad) => {
         try {
+            const { ciudad, pais } = datos;
+            const appid = import.meta.env.VITE_API_KEY;
+    
+            const urlGeoLocalizacion = `https://api.openweathermap.org/geo/1.0/direct?appid=${appid}&q=${ciudad},${pais}`;
+    
+            const { data } = await axios.get(urlGeoLocalizacion);
+    
+            const { lat, lon } = data[0];
+    
+            const urlRequestClima = `http://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${appid}`;
+            const { data: datosClima } = await axios.get(urlRequestClima);
+    
+            setResultado(datosClima)
 
-            const { ciudad } = datos;
-            const apiid = import.meta.env.VITE_API_KEY
-
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${apiid}`
-
-            await axios.get(url)
 
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
-    }
+    };
+    
+
+    
 
     return (
         <ClimaContext.Provider
@@ -62,6 +73,7 @@ const ClimaProvider = ({children}: PropsWithChildren) => {
             busqueda,
             resultado,
             actualizarDatosBusqueda,
+            consultarClima
             
         }}
         >
