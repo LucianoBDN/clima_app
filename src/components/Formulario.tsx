@@ -7,9 +7,7 @@ const Formulario = () => {
     const {actualizarDatosBusqueda, busqueda : {ciudad, pais,}, consultarClima } = useClima()
 
 
-    if([ciudad,pais].includes("")){
-        alert("ingrese todos los datos")
-    }
+
 
 
     const handleSubmit = (e: FormEvent) => {
@@ -19,6 +17,10 @@ const Formulario = () => {
             pais,
         })
     }
+
+    // if([ciudad,pais].includes("")){
+    //     alert("ingrese todos los datos")
+    // }
     
 
     return (
